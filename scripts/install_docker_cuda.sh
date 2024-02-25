@@ -50,7 +50,6 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 # so docker can run without sudo
 sudo groupadd docker
 sudo usermod -aG docker $USER
-newgrp docker 
 
 # Install NVIDIA Driver (replace with the specific version if required)
 echo "Installing NVIDIA driver..."
