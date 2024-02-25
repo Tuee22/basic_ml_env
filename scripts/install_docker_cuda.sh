@@ -2,29 +2,46 @@
 
 # generated via https://chat.openai.com/share/94f1c437-9617-4f4e-a9d7-9e51a9158830
 
-# Update and Upgrade the APT packages
-echo "Updating and upgrading APT packages..."
+
+
+
+#!/bin/bash
+
+# Set the DEBIAN_FRONTEND variable to noninteractive to suppress prompts
 export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update && sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
-# Install dependencies for adding a repository over HTTPS
-echo "Installing dependencies for adding a repository over HTTPS..."
-sudo apt-get install -y \
-    ca-certificates \
-    curl \
-    software-properties-common
-
-# Add NVIDIA package repositories
-echo "Adding the NVIDIA package repositories..."
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring.gpg
-sudo gpg --dearmor -o /usr/share/keyrings/cuda-archive-keyring.gpg cuda-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" | sudo tee /etc/apt/sources.list.d/cuda.list
-
+# Update package lists
+echo "Updating package lists..."
 sudo apt-get update
 
-# Install NVIDIA Driver version 535
-echo "Installing NVIDIA Driver version 535..."
-sudo apt-get install -y nvidia-driver-535
+# Install unattended-upgrades if not already installed
+echo "Installing unattended-upgrades..."
+sudo apt-get install -y unattended-upgrades
+
+# Enable automatic updates for all packages (not just security updates)
+echo "Configuring unattended-upgrades for all packages..."
+sudo sed -i 's,//\("${distro_id}:${distro_codename}-updates";\),\1,' /etc/apt/apt.conf.d/50unattended-upgrades
+
+# Configure automatic updates
+echo "Enabling automatic updates..."
+sudo bash -c 'cat > /etc/apt/apt.conf.d/20auto-upgrades << EOF
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF'
+
+# Install needrestart to automatically handle service restarts
+echo "Installing needrestart..."
+sudo apt-get install -y needrestart
+
+# Configure needrestart to automatically restart services
+echo "Configuring needrestart for automatic restarts..."
+sudo sed -i 's/#\$nrconf{restart} = .*/\$nrconf{restart} = "a";/' /etc/needrestart/needrestart.conf
+
+# Upgrade packages non-interactively
+echo "Upgrading packages non-interactively..."
+sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
 # Install Docker
 echo "Installing Docker..."
@@ -34,9 +51,9 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Manage Docker as a non-root user (Optional)
-sudo groupadd docker
-sudo usermod -aG docker $USER
+# Install NVIDIA Driver (replace with the specific version if required)
+echo "Installing NVIDIA driver..."
+sudo apt-get install -y nvidia-driver-535
 
 # Install NVIDIA Container Toolkit
 echo "Installing NVIDIA Container Toolkit..."
@@ -47,4 +64,4 @@ sudo apt-get update
 sudo apt-get install -y nvidia-docker2
 sudo systemctl restart docker
 
-echo "Script execution completed. Please reboot."
+echo "Script execution completed. Please consider rebooting your system for all changes to take effect."
