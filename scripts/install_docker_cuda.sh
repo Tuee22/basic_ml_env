@@ -1,16 +1,11 @@
 #!/bin/bash
 
-# NB: this script was created by chat GPT from the following prompt :
-# i have a vanilla ec2 instance running ubuntu 22.04 with an nvidia GPU. can you please write me a script that does the following:
-#- updates all apt packages (with no user prompts)
-#- installs nvidia drivers version 535
-#- installs docker
-#- installs whatever else is needed for nvidia containers to work properly with the gpu
-
+# generated via https://chat.openai.com/share/94f1c437-9617-4f4e-a9d7-9e51a9158830
 
 # Update and Upgrade the APT packages
 echo "Updating and upgrading APT packages..."
-sudo apt-get update && sudo apt-get upgrade -y
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update && sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 
 # Install dependencies for adding a repository over HTTPS
 echo "Installing dependencies for adding a repository over HTTPS..."
