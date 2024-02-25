@@ -23,4 +23,4 @@ RUN jupyter lab build
 RUN unset NODE_OPTIONS
 
 EXPOSE 8888
-CMD jupyter lab --ip=0.0.0.0 --port=8888 --LabApp.token="" --notebook-dir='/home/jupyter' --no-browser --allow-root &
+CMD jupyter lab --ip=0.0.0.0 --port=8888 --LabApp.token="" --notebook-dir='/home/jupyter' --no-browser --allow-root
