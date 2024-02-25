@@ -3,10 +3,6 @@
 # generated via https://chat.openai.com/share/94f1c437-9617-4f4e-a9d7-9e51a9158830
 
 
-
-
-#!/bin/bash
-
 # Set the DEBIAN_FRONTEND variable to noninteractive to suppress prompts
 export DEBIAN_FRONTEND=noninteractive
 
@@ -50,6 +46,11 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# so docker can run without sudo
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker 
 
 # Install NVIDIA Driver (replace with the specific version if required)
 echo "Installing NVIDIA driver..."
