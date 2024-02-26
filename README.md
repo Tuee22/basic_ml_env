@@ -2,7 +2,7 @@
 
 0) you need a Ubuntu machine with an Nvidia GPU that you can ssh into.
 
-For an AWS Option, I have tested with a `g5.xlarge' instance. Increase the root volume 100gb, the 8gb default won't be enough. This makes for a fairly powerful AI workstation that is still affordable. The on-demand price is around $1/hr. It's a good price for compute hardware that costs maybe $15k to buy physically. This makes it good value for R&D-- as long as you don't forget to shut it down when you're not using it !
+For an AWS Option, I have tested with a `g5.xlarge' ec2 instance. Increase the root volume 100gb, the 8gb default won't be enough. This makes for a fairly powerful AI workstation that is still affordable. The on-demand price is around $1/hr. It's a good price for compute hardware that costs maybe $15k to buy physically. This makes it good value for R&D-- as long as you don't forget to shut it down when you're not using it !
 
 Make sure you use the Ubunutu base image, and use 'ubuntu' as the username when you ssh in.
 
