@@ -7,7 +7,7 @@ For an AWS Option, I have tested with a `g5.xlarge' ec2 instance. Increase the r
 Make sure you use the Ubuntu base image, and use 'ubuntu' as the username when you ssh in.
 
 Then do the following on the machine via ssh:
-1) Clone this repo onto that machine `git clone git@github.com:Tuee22/basic_ml_env.git ~/basic_ml_env`. (NB: you will first need to generate an ssh key with `ssh-keygen` and add the public key to your github.)
+1) Clone this repo onto that machine `git clone git@github.com:Tuee22/basic_ml_env.git ~/basic_ml_env`.
 2) type `~/basic_ml_env/scripts/install_docker_cuda.sh`, and reboot the machine when it's done with `sudo reboot now`
 3) type `cd ~/basic_ml_env/docker` then `docker compose up -d` (this only needs to be done once, the container will start automatically on reboots)
 4) once the container builds, the jupyter notebook should be listening on port 8888
