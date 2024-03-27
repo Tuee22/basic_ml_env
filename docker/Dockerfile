@@ -11,7 +11,7 @@ RUN n stable
 
 # install python packages
 WORKDIR /app
-#RUN python3 -m pip install pandas edward gym[classic_control] matplotlib numba pymc3 pystan QuantLib scikit-learn scipy scons seaborn statsmodels pydot graphviz dask[complete] cupy-cuda12x jupyterlab==3.6.6 plotly ipywidgets boto3 fabric tables pyarrow s3fs mypy pandas-stubs sympy torch lightning torchvision torchtext torchmetrics torchdata torchaudio moviepy tensorboard
+#RUN python3 -m pip install pandas edward gym[classic_control] matplotlib numba pymc3 pystan QuantLib scikit-learn scipy scons seaborn statsmodels pydot graphviz dask[complete] cupy-cuda12x jupyterlab==3.6.6 plotly ipywidgets boto3 fabric tables pyarrow s3fs mypy pandas-stubs sympy torch lightning torchvision torchtext torchmetrics torchdata torchaudio moviepy tensorboard protobuf pydantic
 COPY requirements.txt /app/
 RUN python3 -m pip install -r requirements.txt
 
