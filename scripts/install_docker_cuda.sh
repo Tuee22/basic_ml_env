@@ -83,18 +83,11 @@ else
     echo "$LINKERD_FOLDER_PATH is already in the PATH."
 fi
 
-# Enable autocomplete for k
-apt update
-apt install -y bash-completion
-if [ ! -f /etc/bash_completion.d/kubectl ]; then
-    kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl >/dev/null
-fi
-if ! grep -q "alias k=kubectl" ~/.bashrc; then
-    echo "alias k=kubectl" >>~/.bashrc
-fi
-if ! grep -q "complete -o default -F __start_kubectl k" ~/.bashrc; then
-    echo "complete -o default -F __start_kubectl k" >>~/.bashrc
-fi
+# install kubectl
+echo "kubectl not installed. Installing..."
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$BIN_ARCH/kubectl"
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
 
 # Install NVIDIA Driver
 echo "Installing NVIDIA driver..."
