@@ -51,6 +51,52 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
+# install minikube
+# Detect the architecture of the current system
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64)
+        BIN_ARCH="amd64"
+        ;;
+    arm64 | aarch64)
+        BIN_ARCH="arm64"
+        ;;
+    *)
+        echo "Unsupported architecture: $ARCH"
+        exit 1
+        ;;
+esac
+# Download the correct binary based on the architecture
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$BIN_ARCH
+# Install the binary and clean up
+sudo install minikube-linux-$BIN_ARCH /usr/local/bin/minikube && rm minikube-linux-$BIN_ARCH
+
+# install helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+# install linkerd
+curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | sh
+# Define the folder you want to add to PATH
+LINKERD_FOLDER_PATH="$HOME/.linkerd2/bin"
+
+# Check if the PATH already contains the folder
+if ! grep -q "export PATH=\$PATH:$LINKERD_FOLDER_PATH" ~/.bashrc; then
+    # Add the folder to the PATH in ~/.bashrc
+    echo "export PATH=\$PATH:$LINKERD_FOLDER_PATH" >> ~/.bashrc
+
+    echo "$LINKERD_FOLDER_PATH added to PATH for this user."
+else
+    echo "$LINKERD_FOLDER_PATH is already in the PATH."
+fi
+
+# enable autocomplete for k
+apt update
+apt install -y bash-completion
+kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+
+echo 'alias k=kubectl' >>~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
+
 # Install NVIDIA Driver (replace with the specific version if required)
 echo "Installing NVIDIA driver..."
 sudo apt-get install -y nvidia-driver-535
