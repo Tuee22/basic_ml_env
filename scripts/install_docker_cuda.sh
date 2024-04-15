@@ -2,7 +2,6 @@
 
 # generated via https://chat.openai.com/share/94f1c437-9617-4f4e-a9d7-9e51a9158830
 
-
 # Set the DEBIAN_FRONTEND variable to noninteractive to suppress prompts
 export DEBIAN_FRONTEND=noninteractive
 
@@ -18,14 +17,14 @@ sudo apt-get install -y unattended-upgrades
 echo "Configuring unattended-upgrades for all packages..."
 sudo sed -i 's,//\("${distro_id}:${distro_codename}-updates";\),\1,' /etc/apt/apt.conf.d/50unattended-upgrades
 
-# Configure automatic updates
+# Configure automatic updates using heredoc for cleanliness and correctness
 echo "Enabling automatic updates..."
-sudo bash -c 'cat > /etc/apt/apt.conf.d/20auto-upgrades << EOF
+sudo bash -c 'cat > /etc/apt/apt.conf.d/20auto-upgrades' <<EOF
 APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Download-Upgradeable-Packages "1";
 APT::Periodic::AutocleanInterval "7";
 APT::Periodic::Unattended-Upgrade "1";
-EOF'
+EOF
 
 # Install needrestart to automatically handle service restarts
 echo "Installing needrestart..."
@@ -52,7 +51,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 
 # install minikube
-# Detect the architecture of the current system
+echo "Installing minikube..."
 ARCH=$(uname -m)
 case $ARCH in
     x86_64)
@@ -66,38 +65,38 @@ case $ARCH in
         exit 1
         ;;
 esac
-# Download the correct binary based on the architecture
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$BIN_ARCH
-# Install the binary and clean up
 sudo install minikube-linux-$BIN_ARCH /usr/local/bin/minikube && rm minikube-linux-$BIN_ARCH
 
 # install helm
+echo "Installing Helm..."
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 # install linkerd
+echo "Installing Linkerd..."
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install-edge | sh
-# Define the folder you want to add to PATH
 LINKERD_FOLDER_PATH="$HOME/.linkerd2/bin"
-
-# Check if the PATH already contains the folder
 if ! grep -q "export PATH=\$PATH:$LINKERD_FOLDER_PATH" ~/.bashrc; then
-    # Add the folder to the PATH in ~/.bashrc
     echo "export PATH=\$PATH:$LINKERD_FOLDER_PATH" >> ~/.bashrc
-
     echo "$LINKERD_FOLDER_PATH added to PATH for this user."
 else
     echo "$LINKERD_FOLDER_PATH is already in the PATH."
 fi
 
-# enable autocomplete for k
+# Enable autocomplete for k
 apt update
 apt install -y bash-completion
-kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl > /dev/null
+if [ ! -f /etc/bash_completion.d/kubectl ]; then
+    kubectl completion bash | sudo tee /etc/bash_completion.d/kubectl >/dev/null
+fi
+if ! grep -q "alias k=kubectl" ~/.bashrc; then
+    echo "alias k=kubectl" >>~/.bashrc
+fi
+if ! grep -q "complete -o default -F __start_kubectl k" ~/.bashrc; then
+    echo "complete -o default -F __start_kubectl k" >>~/.bashrc
+fi
 
-echo 'alias k=kubectl' >>~/.bashrc
-echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
-
-# Install NVIDIA Driver (replace with the specific version if required)
+# Install NVIDIA Driver
 echo "Installing NVIDIA driver..."
 sudo apt-get install -y nvidia-driver-535
 
