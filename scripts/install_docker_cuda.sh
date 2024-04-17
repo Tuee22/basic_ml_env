@@ -89,6 +89,33 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
+# configure minikube as a service to start automatically
+echo "Creating systemd service file for Minikube..."
+sudo bash -c 'cat <<EOF > /etc/systemd/system/minikube.service
+[Unit]
+Description=Minikube Kubernetes local cluster
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/minikube start
+ExecStop=/usr/local/bin/minikube stop
+RemainAfterExit=yes
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+# Note: Replace $USER with the username under which you want to run Minikube,
+# or use `User=root` if Minikube needs administrative privileges.
+
+# Step 2: Reload systemd to recognize the new service
+echo "Reloading systemd..."
+sudo systemctl daemon-reload
+sudo systemctl enable minikube.service
+sudo systemctl start minikube.service
+
 # Install NVIDIA Driver
 echo "Installing NVIDIA driver..."
 sudo apt-get install -y nvidia-driver-535
