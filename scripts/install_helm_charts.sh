@@ -18,3 +18,7 @@ EOF'
 
 # make script executable
 sudo chmod +x /home/ubuntu/minikube_port_forward.sh
+
+# restart port forwarding service
+sudo systemctl daemon-reload
+sudo systemctl restart minikube-port-forward.service
