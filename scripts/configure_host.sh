@@ -50,8 +50,7 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 sudo groupadd docker
 sudo usermod -aG docker $USER
 
-# install minikube
-echo "Installing minikube..."
+# determine if this is amd64 or arm64
 ARCH=$(uname -m)
 case $ARCH in
     x86_64)
@@ -65,6 +64,8 @@ case $ARCH in
         exit 1
         ;;
 esac
+
+# install minikube
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$BIN_ARCH
 sudo install minikube-linux-$BIN_ARCH /usr/local/bin/minikube && rm minikube-linux-$BIN_ARCH
 
@@ -86,7 +87,7 @@ fi
 # install kubectl
 echo "kubectl not installed. Installing..."
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$BIN_ARCH/kubectl"
-chmod +x ./kubectl
+sudo chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 
 # configure minikube as a service to start automatically
@@ -94,13 +95,28 @@ echo "Creating systemd service file for Minikube..."
 sudo bash -c 'cat <<EOF > /etc/systemd/system/minikube.service
 [Unit]
 Description=Minikube Kubernetes local cluster
-After=network.target
+After=network.target docker.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/minikube start
 ExecStop=/usr/local/bin/minikube stop
 RemainAfterExit=yes
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+EOF'
+
+sudo bash -c 'cat <<EOF > /etc/systemd/system/minikube-port-forward.service
+[Unit]
+Description=Kubernetes multiple port forwardings
+After=network.target minikube.service
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/minikube_port_forward.sh
+Restart=on-failure
 User=ubuntu
 
 [Install]
@@ -115,6 +131,8 @@ echo "Reloading systemd..."
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 sudo systemctl start minikube.service
+sudo systemctl enable minikube-port-forward.service
+sudo systemctl start minikube-port-forward.service
 
 # Install NVIDIA Driver
 echo "Installing NVIDIA driver..."
